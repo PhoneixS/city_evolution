@@ -1,4 +1,5 @@
 
+from datetime import timedelta
 import numpy as np
 
 # import the pygame module, so you can use it
@@ -23,12 +24,14 @@ def main(width: int, height: int):
      
     # create a surface on screen that has the size of 240 x 180
     screen = pygame.display.set_mode((width,height), vsync=1)
-     
+
     # define a variable to control the main loop
     running = True
 
     surfarray.blit_array(screen, motor.get_terreno())
     pygame.display.flip()
+
+    previous_ticks=pygame.time.get_ticks()
      
     # main loop
     while running:
@@ -39,10 +42,21 @@ def main(width: int, height: int):
             if event.type == pygame.QUIT:
                 # change the value to False, to exit the main loop
                 running = False
-        
-        motor.procesa()
+            
+            motor.on_event(event)
+
+        nuevo_ticks = pygame.time.get_ticks()
+
+        time = (nuevo_ticks - previous_ticks) / 1000
+
+        motor.procesa(timedelta(milliseconds=time))
+
+        previous_ticks = nuevo_ticks
 
         surfarray.blit_array(screen, motor.get_terreno())
+
+        motor.dibuja(screen)
+
         pygame.display.flip()
 
 
